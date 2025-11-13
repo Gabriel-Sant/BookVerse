@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookVerse - Frontend Minimalista</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      background: #f6f6f6;
+      color: #333;
+    }
+    h1, h2 {
+      color: #444;
+    }
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    input, textarea {
+      display: block;
+      margin: 8px 0;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+    .card {
+      background: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.1);
+    }
+    small { color: #777; }
+  </style>
+</head>
+<body>
+  <h1>BookVerse - Painel de Teste</h1>
+
+  <h2>Criar Autor</h2>
+  <form id="formAutor">
+    <input type="text" id="autorNome" placeholder="Nome" required />
+    <input type="text" id="autorBio" placeholder="Biografia" />
+    <input type="text" id="autorNac" placeholder="Nacionalidade" />
+    <button type="submit">Criar Autor</button>
+  </form>
+
+  <h2>Autores</h2>
+  <div id="listaAutores" class="list"></div>
+
+  <hr/>
+
+  <h2>Criar Livro</h2>
+  <form id="formLivro">
+    <input type="text" id="livroTitulo" placeholder="Título" required />
+    <input type="text" id="livroDescricao" placeholder="Descrição" />
+    <input type="number" id="livroPreco" placeholder="Preço" step="0.01" required />
+    <input type="text" id="livroAutorId" placeholder="ID do Autor" required />
+    <button type="submit">Criar Livro</button>
+  </form>
+
+  <h2>Livros</h2>
+  <div id="listaLivros" class="list"></div>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    // Atualiza listagens
+    async function carregarAutores() {
+      const res = await fetch(`${API_BASE}/authors`);
+      const autores = await res.json();
+      const lista = document.getElementById("listaAutores");
+      lista.innerHTML = "";
+      autores.forEach(a => {
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <strong>${a.name}</strong><br>
+          <small>${a.nationality || ""}</small><br>
+          <em>${a.biography || ""}</em><br>
+          <small>ID: ${a.id}</small>
+        `;
+        lista.appendChild(el);
+      });
+    }
+
+    async function carregarLivros() {
+      const res = await fetch(`${API_BASE}/books?expand=author`);
+      const livros = await res.json();
+      const lista = document.getElementById("listaLivros");
+      lista.innerHTML = "";
+      livros.forEach(l => {
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <strong>${l.title}</strong><br>
+          <small>Preço: R$ ${l.price}</small><br>
+          <em>${l.description || ""}</em><br>
+          <small>Autor: ${l.author ? l.author.name : l.authorId}</small><br>
+          <small>ID: ${l.id}</small>
+        `;
+        lista.appendChild(el);
+      });
+    }
+
+    // Envio de formulários
+    document.getElementById("formAutor").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const autor = {
+        name: autorNome.value,
+        biography: autorBio.value,
+        nationality: autorNac.value
+      };
+      await fetch(`${API_BASE}/authors`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(autor)
+      });
+      autorNome.value = autorBio.value = autorNac.value = "";
+      await carregarAutores();
+    });
+
+    document.getElementById("formLivro").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const livro = {
+        title: livroTitulo.value,
+        description: livroDescricao.value,
+        price: Number(livroPreco.value),
+        authorId: livroAutorId.value
+      };
+      await fetch(`${API_BASE}/books`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(livro)
+      });
+      livroTitulo.value = livroDescricao.value = livroPreco.value = livroAutorId.value = "";
+      await carregarLivros();
+    });
+
+    // Inicializa
+    carregarAutores();
+    carregarLivros();
+  </script>
+</body>
+</html>
