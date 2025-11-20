@@ -1,12 +1,13 @@
-
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const cors = require('cors');
 
 const DATA_FILE = path.join(__dirname, 'data.json');
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 async function readData() {
@@ -15,7 +16,8 @@ async function readData() {
     return JSON.parse(raw);
   } catch (err) {
     if (err.code === 'ENOENT') {
-      const initial = { authors: [], books: [] };
+      // Incluindo os novos arrays vazios para Usuários e Categorias
+      const initial = { authors: [], books: [], users: [], categories: [] };
       await writeData(initial);
       return initial;
     }
@@ -24,7 +26,6 @@ async function readData() {
 }
 
 async function writeData(data) {
-  
   await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
@@ -35,6 +36,7 @@ function isValidPrice(v) {
   return typeof v === 'number' && v >= 0;
 }
 
+// --- MÓDULO AUTOR (CRUD COMPLETO) - JÁ EXISTENTE ---
 app.post('/authors', async (req, res) => {
   try {
     const { name, biography, nationality } = req.body;
@@ -103,6 +105,7 @@ app.delete('/authors/:id', async (req, res) => {
     const { id } = req.params;
     const data = await readData();
     
+    // Regra de Negócio: Autor não pode ser excluído se estiver associado a um livro.
     const usedByBook = data.books.some(b => b.authorId === id);
     if (usedByBook) return res.status(400).json({ error: 'Autor está associado a um livro e não pode ser excluído.' });
 
@@ -119,7 +122,7 @@ app.delete('/authors/:id', async (req, res) => {
 });
 
 
-
+// --- MÓDULO LIVRO (CRUD COMPLETO) - JÁ EXISTENTE ---
 app.post('/books', async (req, res) => {
   try {
     const { title, description, price, file, authorId, categoryId } = req.body;
@@ -161,6 +164,13 @@ app.get('/books', async (req, res) => {
       return { ...b, author };
     });
   }
+  // Adiciona 'category' no expand, se solicitado
+  if (expand === 'category' || expand === 'author,category') {
+      books = books.map(b => {
+          const category = data.categories.find(c => c.id === b.categoryId) || null;
+          return { ...b, category };
+      });
+  }
   res.json(books);
 });
 
@@ -169,11 +179,14 @@ app.get('/books/:id', async (req, res) => {
   const { id } = req.params;
   const { expand } = req.query;
   const data = await readData();
-  const book = data.books.find(b => b.id === id);
+  let book = data.books.find(b => b.id === id);
   if (!book) return res.status(404).json({ error: 'Livro não encontrado' });
-  if (expand === 'author') {
+  
+  if (expand === 'author' || expand === 'category' || expand === 'author,category') {
+    // Implementa o expand para autor e categoria na rota GET /books/:id
     const author = data.authors.find(a => a.id === book.authorId) || null;
-    return res.json({ ...book, author });
+    const category = data.categories.find(c => c.id === book.categoryId) || null;
+    book = { ...book, author, category };
   }
   res.json(book);
 });
@@ -203,7 +216,12 @@ app.put('/books/:id', async (req, res) => {
       if (!authorExists) return res.status(400).json({ error: 'Autor não encontrado (authorId inválido).' });
       data.books[idx].authorId = authorId;
     }
-    if (categoryId !== undefined) data.books[idx].categoryId = categoryId || null;
+    if (categoryId !== undefined) {
+        if (categoryId && !isValidString(categoryId)) return res.status(400).json({ error: 'categoryId inválido.' });
+        const categoryExists = categoryId ? data.categories.some(c => c.id === categoryId) : true;
+        if (!categoryExists) return res.status(400).json({ error: 'Categoria não encontrada (categoryId inválido).' });
+        data.books[idx].categoryId = categoryId || null;
+    }
 
     data.books[idx].updatedAt = new Date().toISOString();
     await writeData(data);
@@ -230,7 +248,200 @@ app.delete('/books/:id', async (req, res) => {
   }
 });
 
+// --- MÓDULO USUÁRIO (CRUD COMPLETO) ---
 
+// [RF01.1] Cadastrar Usuário
+app.post('/users', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        if (!isValidString(name) || !isValidString(email) || !isValidString(password)) {
+            return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
+        }
+
+        const data = await readData();
+        const emailExists = data.users.some(u => u.email === email.trim());
+        if (emailExists) return res.status(400).json({ error: 'E-mail já cadastrado.' });
+
+        const newUser = {
+            id: uuidv4(),
+            name: name.trim(),
+            email: email.trim(),
+            password, // Em um ambiente real, NUNCA salvaríamos a senha assim (deveria ser hashed).
+            createdAt: new Date().toISOString()
+        };
+        data.users.push(newUser);
+        await writeData(data);
+        // Retorna o usuário sem a senha por segurança (mesmo sendo um mock)
+        const { password: _, ...safeUser } = newUser; 
+        return res.status(201).json(safeUser);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// [RF01.2] Consultar Usuário (Todos)
+app.get('/users', async (req, res) => {
+    const data = await readData();
+    // Retorna todos os usuários, removendo a senha de cada um
+    const safeUsers = data.users.map(({ password: _, ...user }) => user);
+    res.json(safeUsers);
+});
+
+// [RF01.2] Consultar Usuário (ID)
+app.get('/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const data = await readData();
+    const user = data.users.find(u => u.id === id);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    // Retorna o usuário, removendo a senha
+    const { password: _, ...safeUser } = user;
+    res.json(safeUser);
+});
+
+// [RF01.3] Atualizar Usuário
+app.put('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, password } = req.body;
+        const data = await readData();
+        const idx = data.users.findIndex(u => u.id === id);
+        if (idx === -1) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+        if (name !== undefined) {
+            if (!isValidString(name)) return res.status(400).json({ error: 'Nome inválido' });
+            data.users[idx].name = name.trim();
+        }
+        if (email !== undefined) {
+            if (!isValidString(email)) return res.status(400).json({ error: 'E-mail inválido' });
+             // Verifica se o novo e-mail já pertence a outro usuário
+            const emailExists = data.users.some((u, i) => i !== idx && u.email === email.trim());
+            if (emailExists) return res.status(400).json({ error: 'E-mail já cadastrado para outro usuário.' });
+
+            data.users[idx].email = email.trim();
+        }
+        if (password !== undefined) data.users[idx].password = password;
+        
+        data.users[idx].updatedAt = new Date().toISOString();
+        await writeData(data);
+        
+        // Retorna o usuário, removendo a senha
+        const { password: _, ...safeUser } = data.users[idx];
+        res.json(safeUser);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// [RF01.4] Excluir Usuário
+app.delete('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await readData();
+        
+        // Regra de Negócio: Usuário não pode ser excluído se tiver dependências (e.g., Pedidos, Avaliações).
+        // Por enquanto, verificamos apenas se ele está listado como ID de autor em algum livro (apenas um placeholder)
+        const usedInBook = data.books.some(b => b.authorId === id); // Usando authorId para simular uma relação
+        if (usedInBook) return res.status(400).json({ error: 'Usuário possui registros associados (Livros) e não pode ser excluído.' });
+
+
+        const newUsers = data.users.filter(u => u.id !== id);
+        if (newUsers.length === data.users.length) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+        data.users = newUsers;
+        await writeData(data);
+        res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// --- MÓDULO CATEGORIA (CRUD COMPLETO) ---
+
+// [RF04.1] Criar Categoria
+app.post('/categories', async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!isValidString(name)) return res.status(400).json({ error: 'Nome da categoria é obrigatório.' });
+
+        const data = await readData();
+        const newCategory = {
+            id: uuidv4(),
+            name: name.trim(),
+            createdAt: new Date().toISOString()
+        };
+        data.categories.push(newCategory);
+        await writeData(data);
+        return res.status(201).json(newCategory);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// [RF04.2] Consultar Categoria (Todas)
+app.get('/categories', async (req, res) => {
+    const data = await readData();
+    res.json(data.categories);
+});
+
+// [RF04.2] Consultar Categoria (ID)
+app.get('/categories/:id', async (req, res) => {
+    const { id } = req.params;
+    const data = await readData();
+    const cat = data.categories.find(c => c.id === id);
+    if (!cat) return res.status(404).json({ error: 'Categoria não encontrada' });
+    res.json(cat);
+});
+
+// [RF04.3] Atualizar Categoria
+app.put('/categories/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        const data = await readData();
+        const idx = data.categories.findIndex(c => c.id === id);
+        if (idx === -1) return res.status(404).json({ error: 'Categoria não encontrada' });
+
+        if (name !== undefined) {
+            if (!isValidString(name)) return res.status(400).json({ error: 'Nome inválido' });
+            data.categories[idx].name = name.trim();
+        }
+
+        data.categories[idx].updatedAt = new Date().toISOString();
+        await writeData(data);
+        res.json(data.categories[idx]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// [RF04.4] Excluir Categoria
+app.delete('/categories/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await readData();
+        
+        // Regra de Negócio: Categoria não pode ser excluída se estiver associada a um livro.
+        const usedByBook = data.books.some(b => b.categoryId === id);
+        if (usedByBook) return res.status(400).json({ error: 'Categoria está associada a um livro e não pode ser excluída.' });
+
+        const newCategories = data.categories.filter(c => c.id !== id);
+        if (newCategories.length === data.categories.length) return res.status(404).json({ error: 'Categoria não encontrada' });
+
+        data.categories = newCategories;
+        await writeData(data);
+        res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// --- ROTA DE SAÚDE ---
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 
