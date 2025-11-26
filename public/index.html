@@ -1,455 +1,430 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BookVerse - Painel de Teste (Release 02)</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-      background: #f6f6f6;
-      color: #333;
-    }
-    h1, h2, h3 {
-      color: #444;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 5px;
-    }
-    form {
-      background: #fff;
-      padding: 15px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    input, textarea {
-      display: block;
-      margin: 8px 0;
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box; /* Para incluir padding na largura */
-    }
-    button {
-      padding: 8px 12px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 5px;
-    }
-    button.delete { background: #dc3545; }
-    button.update-btn { background: #ffc107; color: #333; }
-    button:hover { opacity: 0.9; }
-    .list {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-    .card {
-      background: #fff;
-      padding: 10px;
-      border-radius: 4px;
-      box-shadow: 0 0 3px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .card-content { flex-grow: 1; }
-    .card-actions { margin-left: 10px; }
-    small { color: #777; }
-    .hidden { display: none; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookVerse</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+            background: #f6f6f6;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #444;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        form {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        input,
+        textarea,
+        select {
+            display: block;
+            margin: 8px 0;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 8px 12px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        button.delete {
+            background: #dc3545;
+        }
+
+        button.update-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .list {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-content {
+            flex-grow: 1;
+        }
+
+        .card-actions {
+            margin-left: 10px;
+        }
+
+        small {
+            color: #777;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>BookVerse - Painel de Teste (Release 02)</h1>
-  <p>4 CRUDs implementados: Autor, Livro, Usuário e Categoria.</p>
+    <h1>BookVerse</h1>
 
-  <hr/>
-  
-  <h2>Autor (RF03.x)</h2>
-  <h3>Criar Autor</h3>
-  <form id="formAutor">
-    <input type="text" id="autorNome" placeholder="Nome" required />
-    <input type="text" id="autorBio" placeholder="Biografia" />
-    <input type="text" id="autorNac" placeholder="Nacionalidade" />
-    <button type="submit">Criar Autor</button>
-  </form>
+    <hr />
 
-  <h3>Listagem de Autores (Consultar, Atualizar, Excluir)</h3>
-  <div id="listaAutores" class="list"></div>
+    <h2>Autor</h2>
+    <h3>Criar Autor</h3>
+    <form id="formAutor">
+        <input type="text" id="autorNome" placeholder="Nome" required />
+        <input type="text" id="autorBio" placeholder="Biografia" />
+        <input type="text" id="autorNac" placeholder="Nacionalidade" />
+        <button type="submit">Criar Autor</button>
+    </form>
+    <div id="listaAutores" class="list"></div>
 
-  <hr/>
+    <hr />
 
-  <h2>Livro (RF02.x)</h2>
-  <h3>Criar Livro</h3>
-  <form id="formLivro">
-    <input type="text" id="livroTitulo" placeholder="Título" required />
-    <input type="text" id="livroDescricao" placeholder="Descrição" />
-    <input type="number" id="livroPreco" placeholder="Preço" step="0.01" required />
-    <input type="text" id="livroAutorId" placeholder="ID do Autor" required />
-    <input type="text" id="livroCategoriaId" placeholder="ID da Categoria (opcional)" />
-    <button type="submit">Criar Livro</button>
-  </form>
+    <h2>Editora</h2>
+    <h3>Criar Editora</h3>
+    <form id="formEditora">
+        <input type="text" id="editoraNome" placeholder="Nome" required />
+        <input type="number" id="editoraAno" placeholder="Ano de Fundação" />
+        <button type="submit">Criar Editora</button>
+    </form>
+    <div id="listaEditoras" class="list"></div>
 
-  <h3>Listagem de Livros (Consultar, Atualizar, Excluir)</h3>
-  <div id="listaLivros" class="list"></div>
+    <hr />
 
-  <hr/>
+    <h2>Categoria</h2>
+    <h3>Criar Categoria</h3>
+    <form id="formCategoria">
+        <input type="text" id="categoriaNome" placeholder="Nome da Categoria" required />
+        <button type="submit">Criar Categoria</button>
+    </form>
+    <div id="listaCategorias" class="list"></div>
 
-  <h2>Usuário (RF01.x)</h2>
-  <h3>Criar Usuário</h3>
-  <form id="formUsuario">
-    <input type="text" id="usuarioNome" placeholder="Nome" required />
-    <input type="email" id="usuarioEmail" placeholder="E-mail" required />
-    <input type="password" id="usuarioSenha" placeholder="Senha" required />
-    <button type="submit">Criar Usuário</button>
-  </form>
+    <hr />
 
-  <h3>Listagem de Usuários (Consultar, Atualizar, Excluir)</h3>
-  <div id="listaUsuarios" class="list"></div>
+    <h2>Livro</h2>
+    <h3>Criar Livro</h3>
+    <form id="formLivro">
+        <input type="text" id="livroTitulo" placeholder="Título" required />
+        <input type="text" id="livroDescricao" placeholder="Descrição" />
+        <input type="number" id="livroPreco" placeholder="Preço" step="0.01" required />
+        <input type="text" id="livroAutorId" placeholder="ID do Autor" required />
+        <input type="text" id="livroCategoriaId" placeholder="ID da Categoria" />
+        <input type="text" id="livroEditoraId" placeholder="ID da Editora" />
+        <button type="submit">Criar Livro</button>
+    </form>
+    <div id="listaLivros" class="list"></div>
 
-  <hr/>
+    <hr />
 
-  <h2>Categoria (RF04.x)</h2>
-  <h3>Criar Categoria</h3>
-  <form id="formCategoria">
-    <input type="text" id="categoriaNome" placeholder="Nome da Categoria" required />
-    <button type="submit">Criar Categoria</button>
-  </form>
+    <h2>Usuário</h2>
+    <h3>Criar Usuário</h3>
+    <form id="formUsuario">
+        <input type="text" id="usuarioNome" placeholder="Nome" required />
+        <input type="email" id="usuarioEmail" placeholder="E-mail" required />
+        <input type="password" id="usuarioSenha" placeholder="Senha" required />
+        <button type="submit">Criar Usuário</button>
+    </form>
+    <div id="listaUsuarios" class="list"></div>
 
-  <h3>Listagem de Categorias (Consultar, Atualizar, Excluir)</h3>
-  <div id="listaCategorias" class="list"></div>
+    <hr />
 
-  <script>
-    const API_BASE = 'http://localhost:3000';
+    <h2>Avaliação</h2>
+    <h3>Criar Avaliação</h3>
+    <form id="formAvaliacao">
+        <input type="text" id="avaliacaoUsuarioId" placeholder="ID do Usuário" required />
+        <input type="text" id="avaliacaoLivroId" placeholder="ID do Livro" required />
+        <input type="number" id="avaliacaoNota" placeholder="Nota (1-5)" min="1" max="5" required />
+        <input type="text" id="avaliacaoComentario" placeholder="Comentário" />
+        <button type="submit">Criar Avaliação</button>
+    </form>
+    <div id="listaAvaliacoes" class="list"></div>
 
-    // --- FUNÇÕES DE UTILIDADE (POST, PUT, DELETE, etc.) ---
+    <hr />
 
-    async function fetchData(url) {
-        const res = await fetch(url);
-        if (!res.ok) {
-            const error = await res.json();
-            alert('Erro ao carregar dados: ' + error.error);
-            return [];
-        }
-        return res.json();
-    }
+    <h2>Cupom</h2>
+    <h3>Criar Cupom</h3>
+    <form id="formCupom">
+        <input type="text" id="cupomCodigo" placeholder="Código" required />
+        <input type="number" id="cupomDesconto" placeholder="Desconto (%)" required />
+        <button type="submit">Criar Cupom</button>
+    </form>
+    <div id="listaCupons" class="list"></div>
 
-    async function handlePost(url, data, callback) {
-        try {
-            const res = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
-            const result = await res.json();
+    <hr />
+
+    <h2>Pedido</h2>
+    <h3>Criar Pedido</h3>
+    <form id="formPedido">
+        <input type="text" id="pedidoUsuarioId" placeholder="ID do Usuário" required />
+        <div id="pedidoItens">
+            <div style="display: flex; gap: 5px;">
+                <input type="text" class="pedidoLivroId" placeholder="ID do Livro" required />
+                <input type="number" class="pedidoQtd" placeholder="Qtd" value="1" required />
+            </div>
+        </div>
+        <button type="button" onclick="adicionarItemPedido()">+ Adicionar Item</button>
+        <br><br>
+        <button type="submit">Criar Pedido</button>
+    </form>
+    <div id="listaPedidos" class="list"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        async function fetchData(url) {
+            const res = await fetch(url);
             if (!res.ok) {
-                alert('Erro ao criar: ' + result.error);
-                return;
-            }
-            callback();
-        } catch (error) {
-            alert('Erro de conexão ao criar.');
-        }
-    }
-
-    async function handleUpdate(url, id, data, callback) {
-        try {
-            const res = await fetch(`${url}/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
-            const result = await res.json();
-            if (!res.ok) {
-                alert('Erro ao atualizar: ' + result.error);
-                return;
-            }
-            callback();
-        } catch (error) {
-            alert('Erro de conexão ao atualizar.');
-        }
-    }
-
-    async function handleDelete(url, id, callback) {
-        if (!confirm("Tem certeza que deseja excluir?")) return;
-        try {
-            const res = await fetch(`${url}/${id}`, { method: "DELETE" });
-            if (res.status === 400) {
-                 // Regra de Negócio Violada
                 const error = await res.json();
-                alert('Regra de Negócio Violada: ' + error.error);
-                return;
+                alert('Erro: ' + error.error);
+                return [];
             }
-            if (!res.ok && res.status !== 204) {
-                alert('Erro ao excluir. Status: ' + res.status);
-                return;
-            }
-            callback();
-        } catch (error) {
-            alert('Erro de conexão ao excluir.');
+            return res.json();
         }
-    }
 
+        async function handlePost(url, data, callback) {
+            try {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (!res.ok) {
+                    alert('Erro: ' + result.error);
+                    return;
+                }
+                callback();
+            } catch (error) {
+                alert('Erro de conexão.');
+            }
+        }
 
-    // --- MÓDULO AUTOR (C, R, U, D) ---
+        async function handleDelete(url, id, callback) {
+            if (!confirm("Confirmar exclusão?")) return;
+            try {
+                const res = await fetch(`${url}/${id}`, { method: "DELETE" });
+                if (!res.ok) {
+                    const error = await res.json();
+                    alert('Erro: ' + error.error);
+                    return;
+                }
+                callback();
+            } catch (error) {
+                alert('Erro de conexão.');
+            }
+        }
 
-    async function carregarAutores() {
-        const autores = await fetchData(`${API_BASE}/authors`);
-        const lista = document.getElementById("listaAutores");
-        lista.innerHTML = "";
-        autores.forEach(a => {
-            const el = document.createElement("div");
-            el.className = "card";
-            el.setAttribute('data-id', a.id);
-            el.innerHTML = `
-                <div class="card-content">
-                    <strong>${a.name}</strong><br>
-                    <small>Nacionalidade: ${a.nationality || "N/A"}</small><br>
-                    <small>ID: ${a.id}</small>
-                </div>
-                <div class="card-actions">
-                    <button class="update-btn" onclick="iniciarEdicao('autor', '${a.id}', '${a.name}', '${a.biography || ''}', '${a.nationality || ''}')">Atualizar</button>
-                    <button class="delete" onclick="handleDelete('${API_BASE}/authors', '${a.id}', carregarAutores)">Excluir</button>
-                </div>
-            `;
-            lista.appendChild(el);
-        });
-    }
-
-    document.getElementById("formAutor").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const autor = {
-            name: autorNome.value,
-            biography: autorBio.value,
-            nationality: autorNac.value
+        // --- AUTOR ---
+        async function carregarAutores() {
+            const dados = await fetchData(`${API_BASE}/authors`);
+            const lista = document.getElementById("listaAutores");
+            lista.innerHTML = dados.map(a => `
+            <div class="card">
+                <div class="card-content"><strong>${a.name}</strong> (ID: ${a.id})</div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/authors', '${a.id}', carregarAutores)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formAutor").onsubmit = (e) => {
+            e.preventDefault();
+            handlePost(`${API_BASE}/authors`, {
+                name: autorNome.value, biography: autorBio.value, nationality: autorNac.value
+            }, () => { e.target.reset(); carregarAutores(); });
         };
-        await handlePost(`${API_BASE}/authors`, autor, () => {
-            autorNome.value = autorBio.value = autorNac.value = "";
-            carregarAutores();
-            carregarLivros(); // Atualiza a lista de livros que pode depender do autor
-        });
-    });
 
+        // --- EDITORA ---
+        async function carregarEditoras() {
+            const dados = await fetchData(`${API_BASE}/publishers`);
+            const lista = document.getElementById("listaEditoras");
+            lista.innerHTML = dados.map(e => `
+            <div class="card">
+                <div class="card-content"><strong>${e.name}</strong> (ID: ${e.id})</div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/publishers', '${e.id}', carregarEditoras)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formEditora").onsubmit = (e) => {
+            e.preventDefault();
+            handlePost(`${API_BASE}/publishers`, {
+                name: editoraNome.value, foundationYear: editoraAno.value
+            }, () => { e.target.reset(); carregarEditoras(); });
+        };
 
-    // --- MÓDULO LIVRO (C, R, U, D) ---
+        // --- CATEGORIA ---
+        async function carregarCategorias() {
+            const dados = await fetchData(`${API_BASE}/categories`);
+            const lista = document.getElementById("listaCategorias");
+            lista.innerHTML = dados.map(c => `
+            <div class="card">
+                <div class="card-content"><strong>${c.name}</strong> (ID: ${c.id})</div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/categories', '${c.id}', carregarCategorias)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formCategoria").onsubmit = (e) => {
+            e.preventDefault();
+            handlePost(`${API_BASE}/categories`, { name: categoriaNome.value }, () => { e.target.reset(); carregarCategorias(); });
+        };
 
-    async function carregarLivros() {
-        const livros = await fetchData(`${API_BASE}/books?expand=author,category`);
-        const lista = document.getElementById("listaLivros");
-        lista.innerHTML = "";
-        livros.forEach(l => {
-            const el = document.createElement("div");
-            el.className = "card";
-            el.setAttribute('data-id', l.id);
-            el.innerHTML = `
+        // --- LIVRO ---
+        async function carregarLivros() {
+            const dados = await fetchData(`${API_BASE}/books?expand=author,category,publisher`);
+            const lista = document.getElementById("listaLivros");
+            lista.innerHTML = dados.map(l => `
+            <div class="card">
                 <div class="card-content">
-                    <strong>${l.title}</strong><br>
-                    <small>Preço: R$ ${l.price}</small><br>
-                    <small>Autor: ${l.author ? l.author.name : l.authorId}</small><br>
-                    <small>Categoria: ${l.category ? l.category.name : "N/A"}</small><br>
+                    <strong>${l.title}</strong> - R$ ${l.price}<br>
+                    <small>Autor: ${l.author?.name || l.authorId} | Categ: ${l.category?.name || 'N/A'} | Edit: ${l.publisher?.name || 'N/A'}</small><br>
                     <small>ID: ${l.id}</small>
                 </div>
-                <div class="card-actions">
-                    <button class="update-btn" onclick="iniciarEdicao('livro', '${l.id}', '${l.title}', '${l.price}', '${l.authorId}')">Atualizar</button>
-                    <button class="delete" onclick="handleDelete('${API_BASE}/books', '${l.id}', carregarLivros)">Excluir</button>
-                </div>
-            `;
-            lista.appendChild(el);
-        });
-    }
-
-    document.getElementById("formLivro").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const livro = {
-            title: livroTitulo.value,
-            description: livroDescricao.value,
-            price: Number(livroPreco.value),
-            authorId: livroAutorId.value,
-            categoryId: livroCategoriaId.value || null
-        };
-        await handlePost(`${API_BASE}/books`, livro, () => {
-            livroTitulo.value = livroDescricao.value = livroPreco.value = livroAutorId.value = livroCategoriaId.value = "";
-            carregarLivros();
-        });
-    });
-
-
-    // --- MÓDULO USUÁRIO (C, R, U, D) ---
-
-    async function carregarUsuarios() {
-        const usuarios = await fetchData(`${API_BASE}/users`);
-        const lista = document.getElementById("listaUsuarios");
-        lista.innerHTML = "";
-        usuarios.forEach(u => {
-            const el = document.createElement("div");
-            el.className = "card";
-            el.setAttribute('data-id', u.id);
-            el.innerHTML = `
-                <div class="card-content">
-                    <strong>${u.name}</strong><br>
-                    <small>Email: ${u.email}</small><br>
-                    <small>ID: ${u.id}</small>
-                </div>
-                <div class="card-actions">
-                    <button class="update-btn" onclick="iniciarEdicao('usuario', '${u.id}', '${u.name}', '${u.email}')">Atualizar</button>
-                    <button class="delete" onclick="handleDelete('${API_BASE}/users', '${u.id}', carregarUsuarios)">Excluir</button>
-                </div>
-            `;
-            lista.appendChild(el);
-        });
-    }
-
-    document.getElementById("formUsuario").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const usuario = {
-            name: usuarioNome.value,
-            email: usuarioEmail.value,
-            password: usuarioSenha.value
-        };
-        await handlePost(`${API_BASE}/users`, usuario, () => {
-            usuarioNome.value = usuarioEmail.value = usuarioSenha.value = "";
-            carregarUsuarios();
-        });
-    });
-
-
-    // --- MÓDULO CATEGORIA (C, R, U, D) ---
-
-    async function carregarCategorias() {
-        const categorias = await fetchData(`${API_BASE}/categories`);
-        const lista = document.getElementById("listaCategorias");
-        lista.innerHTML = "";
-        categorias.forEach(c => {
-            const el = document.createElement("div");
-            el.className = "card";
-            el.setAttribute('data-id', c.id);
-            el.innerHTML = `
-                <div class="card-content">
-                    <strong>${c.name}</strong><br>
-                    <small>ID: ${c.id}</small>
-                </div>
-                <div class="card-actions">
-                    <button class="update-btn" onclick="iniciarEdicao('categoria', '${c.id}', '${c.name}')">Atualizar</button>
-                    <button class="delete" onclick="handleDelete('${API_BASE}/categories', '${c.id}', carregarCategorias)">Excluir</button>
-                </div>
-            `;
-            lista.appendChild(el);
-        });
-    }
-
-    document.getElementById("formCategoria").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const categoria = {
-            name: categoriaNome.value
-        };
-        await handlePost(`${API_BASE}/categories`, categoria, () => {
-            categoriaNome.value = "";
-            carregarCategorias();
-            carregarLivros(); // Atualiza a lista de livros que pode depender da categoria
-        });
-    });
-
-    // --- FUNÇÃO GENÉRICA DE EDIÇÃO/ATUALIZAÇÃO (Front-end Simplificado) ---
-    function iniciarEdicao(modulo, id, ...valores) {
-        const cardElement = document.querySelector(`.card[data-id="${id}"]`);
-        if (!cardElement) return;
-
-        const updateFormId = `updateForm-${id}`;
-        let updateForm = document.getElementById(updateFormId);
-
-        if (updateForm) {
-            cardElement.removeChild(updateForm);
-            return;
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/books', '${l.id}', carregarLivros)">Excluir</button></div>
+            </div>`).join('');
         }
-
-        updateForm = document.createElement('form');
-        updateForm.id = updateFormId;
-        updateForm.style.marginTop = '10px';
-        updateForm.className = 'update-form';
-        
-        const fields = [];
-        let url = '';
-        let reloadFn;
-        let updateData = {};
-
-        switch(modulo) {
-            case 'autor':
-                url = `${API_BASE}/authors`;
-                reloadFn = carregarAutores;
-                fields.push({ key: 'name', placeholder: 'Novo Nome', value: valores[0] });
-                fields.push({ key: 'biography', placeholder: 'Nova Biografia', value: valores[1] });
-                fields.push({ key: 'nationality', placeholder: 'Nova Nacionalidade', value: valores[2] });
-                break;
-            case 'livro':
-                url = `${API_BASE}/books`;
-                reloadFn = carregarLivros;
-                fields.push({ key: 'title', placeholder: 'Novo Título', value: valores[0] });
-                fields.push({ key: 'price', placeholder: 'Novo Preço', type: 'number', step: '0.01', value: valores[1] });
-                fields.push({ key: 'authorId', placeholder: 'Novo ID do Autor', value: valores[2] });
-                break;
-            case 'usuario':
-                url = `${API_BASE}/users`;
-                reloadFn = carregarUsuarios;
-                fields.push({ key: 'name', placeholder: 'Novo Nome', value: valores[0] });
-                fields.push({ key: 'email', placeholder: 'Novo E-mail', type: 'email', value: valores[1] });
-                fields.push({ key: 'password', placeholder: 'Nova Senha (deixe vazio para não alterar)', type: 'password', value: '' });
-                break;
-            case 'categoria':
-                url = `${API_BASE}/categories`;
-                reloadFn = carregarCategorias;
-                fields.push({ key: 'name', placeholder: 'Novo Nome da Categoria', value: valores[0] });
-                break;
-        }
-        
-        fields.forEach(f => {
-            const input = document.createElement('input');
-            input.type = f.type || 'text';
-            input.placeholder = f.placeholder;
-            input.value = f.value;
-            input.step = f.step || '';
-            input.id = `input-${modulo}-${id}-${f.key}`;
-            updateForm.appendChild(input);
-        });
-
-        const saveButton = document.createElement('button');
-        saveButton.type = 'submit';
-        saveButton.textContent = 'Salvar Alterações';
-        updateForm.appendChild(saveButton);
-
-        updateForm.addEventListener('submit', async (e) => {
+        document.getElementById("formLivro").onsubmit = (e) => {
             e.preventDefault();
-            fields.forEach(f => {
-                const value = document.getElementById(`input-${modulo}-${id}-${f.key}`).value;
-                if (value.trim() !== '' && (f.key !== 'password' || value.trim() !== '')) {
-                     // Converte preço para número
-                    updateData[f.key] = f.key === 'price' ? Number(value) : value; 
-                }
+            handlePost(`${API_BASE}/books`, {
+                title: livroTitulo.value, description: livroDescricao.value, price: Number(livroPreco.value),
+                authorId: livroAutorId.value, categoryId: livroCategoriaId.value, publisherId: livroEditoraId.value
+            }, () => { e.target.reset(); carregarLivros(); });
+        };
+
+        // --- USUÁRIO ---
+        async function carregarUsuarios() {
+            const dados = await fetchData(`${API_BASE}/users`);
+            const lista = document.getElementById("listaUsuarios");
+            lista.innerHTML = dados.map(u => `
+            <div class="card">
+                <div class="card-content"><strong>${u.name}</strong> (${u.email}) <br><small>ID: ${u.id}</small></div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/users', '${u.id}', carregarUsuarios)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formUsuario").onsubmit = (e) => {
+            e.preventDefault();
+            handlePost(`${API_BASE}/users`, {
+                name: usuarioNome.value, email: usuarioEmail.value, password: usuarioSenha.value
+            }, () => { e.target.reset(); carregarUsuarios(); });
+        };
+
+        // --- AVALIAÇÃO ---
+        async function carregarAvaliacoes() {
+            const dados = await fetchData(`${API_BASE}/reviews?expand=user,book`);
+            const lista = document.getElementById("listaAvaliacoes");
+            lista.innerHTML = dados.map(r => `
+            <div class="card">
+                <div class="card-content">
+                    <strong>Nota: ${r.rating}</strong> - ${r.book?.title || r.bookId}<br>
+                    <small>Por: ${r.user?.name || r.userId}</small><br>
+                    <small>"${r.comment}"</small>
+                </div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/reviews', '${r.id}', carregarAvaliacoes)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formAvaliacao").onsubmit = (e) => {
+            e.preventDefault();
+            handlePost(`${API_BASE}/reviews`, {
+                userId: avaliacaoUsuarioId.value, bookId: avaliacaoLivroId.value,
+                rating: Number(avaliacaoNota.value), comment: avaliacaoComentario.value
+            }, () => { e.target.reset(); carregarAvaliacoes(); });
+        };
+
+        // --- CUPOM ---
+        async function carregarCupons() {
+            const dados = await fetchData(`${API_BASE}/coupons`);
+            const lista = document.getElementById("listaCupons");
+            lista.innerHTML = dados.map(c => `
+            <div class="card">
+                <div class="card-content"><strong>${c.code}</strong> - ${c.discountPercentage}%</div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/coupons', '${c.id}', carregarCupons)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formCupom").onsubmit = (e) => {
+            e.preventDefault();
+            handlePost(`${API_BASE}/coupons`, {
+                code: cupomCodigo.value, discountPercentage: Number(cupomDesconto.value)
+            }, () => { e.target.reset(); carregarCupons(); });
+        };
+
+        // --- PEDIDO ---
+        function adicionarItemPedido() {
+            const div = document.createElement('div');
+            div.style = "display: flex; gap: 5px; margin-top: 5px;";
+            div.innerHTML = `<input type="text" class="pedidoLivroId" placeholder="ID do Livro" required />
+                         <input type="number" class="pedidoQtd" placeholder="Qtd" value="1" required />`;
+            document.getElementById('pedidoItens').appendChild(div);
+        }
+
+        async function carregarPedidos() {
+            const dados = await fetchData(`${API_BASE}/orders`);
+            const lista = document.getElementById("listaPedidos");
+            lista.innerHTML = dados.map(o => `
+            <div class="card">
+                <div class="card-content">
+                    <strong>Pedido ${o.id.substr(0, 8)}...</strong> - R$ ${o.total}<br>
+                    <small>Status: ${o.status} | Cliente: ${o.userId}</small>
+                </div>
+                <div class="card-actions"><button class="delete" onclick="handleDelete('${API_BASE}/orders', '${o.id}', carregarPedidos)">Excluir</button></div>
+            </div>`).join('');
+        }
+        document.getElementById("formPedido").onsubmit = (e) => {
+            e.preventDefault();
+            const itens = [];
+            const livros = document.querySelectorAll('.pedidoLivroId');
+            const qtds = document.querySelectorAll('.pedidoQtd');
+            livros.forEach((l, i) => {
+                if (l.value) itens.push({ bookId: l.value, quantity: Number(qtds[i].value) });
             });
 
-            await handleUpdate(url, id, updateData, () => {
-                reloadFn();
-                if (modulo === 'autor' || modulo === 'categoria') {
-                    carregarLivros(); // Recarrega livros se autor/categoria mudar
-                }
+            handlePost(`${API_BASE}/orders`, {
+                userId: pedidoUsuarioId.value, items: itens
+            }, () => {
+                e.target.reset();
+                document.getElementById('pedidoItens').innerHTML = `<div style="display: flex; gap: 5px;">
+            <input type="text" class="pedidoLivroId" placeholder="ID do Livro" required />
+            <input type="number" class="pedidoQtd" placeholder="Qtd" value="1" required />
+        </div>`;
+                carregarPedidos();
             });
-            cardElement.removeChild(updateForm); // Remove formulário após salvar
-        });
+        };
 
-        cardElement.appendChild(updateForm);
-    }
+        // INICIALIZAÇÃO
+        carregarAutores();
+        carregarEditoras();
+        carregarCategorias();
+        carregarLivros();
+        carregarUsuarios();
+        carregarAvaliacoes();
+        carregarCupons();
+        carregarPedidos();
 
-
-    // Inicializa todos os carregamentos
-    carregarAutores();
-    carregarLivros();
-    carregarUsuarios();
-    carregarCategorias();
-
-  </script>
+    </script>
 </body>
+
 </html>
